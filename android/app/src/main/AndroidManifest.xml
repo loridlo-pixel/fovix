@@ -1,17 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- INTERNET -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- VPN CORE -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <!-- FOREGROUND SERVICE -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_VPN" />
 
-    <!-- REQUIRED for VpnService -->
-    <uses-permission android:name="android.permission.BIND_VPN_SERVICE"/>
+    <!-- VPN -->
+    <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
 
     <application
-        android:label="FOVIX"
         android:allowBackup="true"
+        android:label="Fovix"
         android:supportsRtl="true">
 
         <!-- MAIN ACTIVITY -->
@@ -26,11 +27,12 @@
 
         </activity>
 
-        <!-- VPN SERVICE (КЛЮЧЕВОЕ) -->
+        <!-- VPN SERVICE -->
         <service
             android:name=".vpn.FovixVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="vpn" />
 
     </application>
 

@@ -1,21 +1,25 @@
 package com.vpn.clienta.subscription
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.vpn.clienta.parser.VlessParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.URL
 
 class SubscriptionRepository {
 
-    private val client = OkHttpClient()
+    suspend fun loadFromUrl(url: String): List<`VlessServer.kt`> {
+        return withContext(Dispatchers.IO) {
 
-    fun fetchSubscription(url: String): String? {
+            val raw = URL(url).readText()
 
-        val request = Request.Builder()
-            .url(url)
-            .build()
+            // поддержка base64 подписок (как у VPN сервисов)
+            val decoded = try {
+                String(android.util.Base64.decode(raw, android.util.Base64.DEFAULT))
+            } catch (e: Exception) {
+                raw
+            }
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return null
-            return response.body?.string()
+            VlessParser.parse(decoded)
         }
     }
 }

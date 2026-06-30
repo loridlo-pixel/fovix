@@ -1,41 +1,39 @@
 package com.vpn.clienta.parser
 
+import android.net.Uri
+
 object VlessParser {
 
-    fun parse(text: String): List<VlessServer> {
+    fun parse(uri: String): VlessServer {
 
-        val lines = text.split("\n")
+        val cleaned = uri.removePrefix("vless://")
 
-        val result = mutableListOf<VlessServer>()
+        val parts = cleaned.split("@")
+        val uuid = parts[0]
 
-        for (line in lines) {
+        val hostPart = parts[1].split("?")
+        val hostPort = hostPart[0].split(":")
 
-            if (!line.startsWith("vless://")) continue
+        val host = hostPort[0]
+        val port = hostPort.getOrElse(1) { "443" }.toInt()
 
-            val clean = line.substringAfter("vless://")
+        val query = Uri.parse(uri)
 
-            val parts = clean.split("@")
-            if (parts.size != 2) continue
+        return VlessServer(
+            name = host,
+            host = host,
+            port = port,
+            uuid = uuid,
 
-            val right = parts[1]
+            security = query.getQueryParameter("security"),
+            flow = query.getQueryParameter("flow"),
+            sni = query.getQueryParameter("sni"),
+            publicKey = query.getQueryParameter("pbk"),
+            shortId = query.getQueryParameter("sid"),
+            fingerprint = query.getQueryParameter("fp"),
+            network = query.getQueryParameter("type"),
 
-            val hostPort = right.substringBefore("?")
-
-            val host = hostPort.substringBefore(":")
-            val port = hostPort.substringAfter(":").toIntOrNull() ?: 443
-
-            val name = line.substringAfter("#", host)
-
-            result.add(
-                VlessServer(
-                    name = name,
-                    host = host,
-                    port = port,
-                    raw = line
-                )
-            )
-        }
-
-        return result
+            raw = uri
+        )
     }
 }

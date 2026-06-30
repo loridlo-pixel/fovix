@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vpn.clienta.domain.VPNState
 import com.vpn.clienta.vpn.FovixVpnService
+import com.vpn.clienta.vpn.RealVpnChecker
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,28 +18,47 @@ class VPNViewModel : ViewModel() {
     private val _vpnState = MutableStateFlow(VPNState.Disconnected)
     val vpnState: StateFlow<VPNState> = _vpnState
 
-    fun onConnectClick(context: Context) {
-        when (_vpnState.value) {
-            VPNState.Disconnected -> connect(context)
-            VPNState.Connected -> disconnect(context)
-            VPNState.Connecting -> return
-        }
-    }
+    fun connect(context: Context, host: String, port: Int, uuid: String) {
 
-    private fun connect(context: Context) {
         viewModelScope.launch {
+
             _vpnState.value = VPNState.Connecting
 
-            kotlinx.coroutines.delay(600)
+            // 1. старт сервиса
+            val intent = Intent(context, FovixVpnService::class.java).apply {
+                putExtra("host", host)
+                putExtra("port", port)
+                putExtra("uuid", uuid)
+            }
 
-            val intent = Intent(context, FovixVpnService::class.java)
             ContextCompat.startForegroundService(context, intent)
 
-            _vpnState.value = VPNState.Connected
+            // 2. даём sing-box подняться
+            delay(3500)
+
+            // 3. ПЕРВАЯ РЕАЛЬНАЯ ПРОВЕРКА
+            val firstCheck = RealVpnChecker.check()
+
+            if (!firstCheck) {
+                _vpnState.value = VPNState.Disconnected
+                return@launch
+            }
+
+            // 4. повторная проверка (стабильность)
+            delay(1500)
+
+            val secondCheck = RealVpnChecker.check()
+
+            _vpnState.value = if (secondCheck) {
+                VPNState.Connected
+            } else {
+                VPNState.Disconnected
+            }
         }
     }
 
-    private fun disconnect(context: Context) {
+    fun disconnect(context: Context) {
+
         val intent = Intent(context, FovixVpnService::class.java)
         context.stopService(intent)
 

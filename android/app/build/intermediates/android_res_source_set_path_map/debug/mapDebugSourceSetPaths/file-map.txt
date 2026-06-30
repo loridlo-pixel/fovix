@@ -1,0 +1,8 @@
+com.vpn.clienta.app-pngs-0 C:\Users\Patriot\Projects\vpn-client-a\android\app\build\generated\res\pngs\debug
+com.vpn.clienta.app-updated_navigation_xml-1 C:\Users\Patriot\Projects\vpn-client-a\android\app\build\generated\updated_navigation_xml\debug
+com.vpn.clienta.app-packageDebugResources-2 C:\Users\Patriot\Projects\vpn-client-a\android\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.vpn.clienta.app-packageDebugResources-3 C:\Users\Patriot\Projects\vpn-client-a\android\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.vpn.clienta.app-debug-4 C:\Users\Patriot\Projects\vpn-client-a\android\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.vpn.clienta.app-debug-5 C:\Users\Patriot\Projects\vpn-client-a\android\app\src\debug\res
+com.vpn.clienta.app-main-6 C:\Users\Patriot\Projects\vpn-client-a\android\app\src\main\res
+gradleHome-0 C:\Users\Patriot\.gradle

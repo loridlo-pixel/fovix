@@ -1,62 +1,39 @@
 package com.vpn.clienta.vpn
 
-import android.content.Context
-import android.system.Os
-import android.util.Log
-import java.io.File
+import org.json.JSONArray
+import org.json.JSONObject
 
-class SingBoxController(
-    private val context: Context
-) {
+object SingBoxConfigBuilder {
 
-    private var process: Process? = null
+    fun build(server: `VlessServer.kt`): String {
 
-    fun start(configJson: String) {
+        val config = JSONObject()
 
-        try {
+        // INBOUND (TUN)
+        val inbound = JSONObject()
+        inbound.put("type", "tun")
+        inbound.put("interface_name", "tun0")
+        inbound.put("inet4_address", "172.19.0.1/30")
+        inbound.put("auto_route", true)
+        inbound.put("strict_route", true)
 
-            val binFile = File(context.filesDir, "singbox")
+        // OUTBOUND (VLESS)
+        val outbound = JSONObject()
+        outbound.put("type", "vless")
+        outbound.put("server", server.host)
+        outbound.put("server_port", server.port)
+        outbound.put("uuid", server.uuid)
+        outbound.put("flow", "xtls-rprx-vision")
 
-            if (!binFile.exists()) {
-                copyBinary(binFile)
-            }
+        val outbounds = JSONArray()
+        outbounds.put(outbound)
 
-            binFile.setExecutable(true)
+        val inbounds = JSONArray()
+        inbounds.put(inbound)
 
-            val configFile = File(context.filesDir, "config.json")
-            configFile.writeText(configJson)
+        config.put("inbounds", inbounds)
+        config.put("outbounds", outbounds)
 
-            val command = arrayOf(
-                binFile.absolutePath,
-                "run",
-                "-c",
-                configFile.absolutePath
-            )
-
-            process = ProcessBuilder(*command)
-                .redirectErrorStream(true)
-                .start()
-
-            Log.d("FOVIX-SINGBOX", "STARTED")
-
-        } catch (e: Exception) {
-            Log.e("FOVIX-SINGBOX", "ERROR", e)
-        }
-    }
-
-    fun stop() {
-        process?.destroy()
-        process = null
-        Log.d("FOVIX-SINGBOX", "STOPPED")
-    }
-
-    private fun copyBinary(outFile: File) {
-
-        context.assets.open("singbox/sing-box").use { input ->
-
-            outFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
+        return config.toString(2)
     }
 }

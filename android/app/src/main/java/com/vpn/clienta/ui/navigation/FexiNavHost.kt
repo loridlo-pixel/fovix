@@ -11,35 +11,42 @@ import com.vpn.clienta.ui.screens.ServersScreen
 import com.vpn.clienta.ui.screens.SettingsScreen
 import com.vpn.clienta.viewmodel.VPNViewModel
 
+enum class FexiDestination {
+    Home, Servers, Settings
+}
+
 @Composable
 fun FexiNavHost(
     modifier: Modifier = Modifier,
-    vpnViewModel: VPNViewModel = viewModel(),
+    vpnViewModel: VPNViewModel = viewModel()
 ) {
-    var currentDestination by remember { mutableStateOf(FexiDestination.Home) }
+
+    var current by remember { mutableStateOf(FexiDestination.Home) }
 
     Scaffold(
         modifier = modifier,
         bottomBar = {
             FexiBottomBar(
-                currentDestination = currentDestination,
-                onDestinationSelected = { currentDestination = it },
+                currentDestination = current,
+                onDestinationSelected = { current = it }
             )
-        },
-    ) { innerPadding ->
+        }
+    ) { padding ->
 
-        when (currentDestination) {
+        when (current) {
+
             FexiDestination.Home -> HomeScreen(
                 viewModel = vpnViewModel,
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.padding(padding)
             )
 
             FexiDestination.Servers -> ServersScreen(
-                modifier = Modifier.padding(innerPadding),
+                viewModel = vpnViewModel,
+                modifier = Modifier.padding(padding)
             )
 
             FexiDestination.Settings -> SettingsScreen(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.padding(padding)
             )
         }
     }
