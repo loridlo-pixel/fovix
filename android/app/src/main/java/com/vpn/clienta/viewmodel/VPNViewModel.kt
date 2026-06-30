@@ -10,7 +10,7 @@ import com.vpn.clienta.vpn.FovixVpnService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-SingboxDebug.checkBinary(context)
+
 class VPNViewModel : ViewModel() {
 
     private val _vpnState = MutableStateFlow(VPNState.Disconnected)
@@ -25,15 +25,12 @@ class VPNViewModel : ViewModel() {
     }
 
     private fun connect(context: Context) {
-
         viewModelScope.launch {
-
             _vpnState.value = VPNState.Connecting
 
             kotlinx.coroutines.delay(600)
 
             val intent = Intent(context, FovixVpnService::class.java)
-
             ContextCompat.startForegroundService(context, intent)
 
             _vpnState.value = VPNState.Connected
@@ -41,7 +38,6 @@ class VPNViewModel : ViewModel() {
     }
 
     private fun disconnect(context: Context) {
-
         val intent = Intent(context, FovixVpnService::class.java)
         context.stopService(intent)
 
