@@ -38,6 +38,10 @@ android {
 }
 
 dependencies {
+    // NETWORK (subscription download)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+// COROUTINES (если вдруг нет)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.activity.compose)
