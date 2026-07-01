@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class VPNViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val appContext = application.applicationContext
-
     private val _state = MutableStateFlow(VpnUiState())
     val state: StateFlow<VpnUiState> = _state.asStateFlow()
 
@@ -26,18 +24,12 @@ class VPNViewModel(application: Application) : AndroidViewModel(application) {
 
     fun connect() {
         val server = _state.value.selectedServer ?: return
-
-        _state.value = _state.value.copy(isConnected = false)
-
-        // 🔥 ВАЖНО: запуск VPN цепочки
-        VpnEngine.connect(appContext, server)
-
+        VpnEngine.connect(getApplication(), server)
         _state.value = _state.value.copy(isConnected = true)
     }
 
     fun disconnect() {
-        VpnEngine.disconnect(appContext)
-
+        VpnEngine.disconnect(getApplication())
         _state.value = _state.value.copy(isConnected = false)
     }
 }

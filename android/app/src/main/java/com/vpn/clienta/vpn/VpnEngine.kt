@@ -6,25 +6,17 @@ import com.vpn.clienta.core.model.VpnServer
 
 object VpnEngine {
 
-    lateinit var appContext: Context
-
-    fun init(context: Context) {
-        appContext = context.applicationContext
-    }
-
-    fun connect(server: VpnServer) {
-        val intent = Intent(appContext, FovixVpnService::class.java).apply {
+    fun connect(context: Context, server: VpnServer) {
+        val intent = Intent(context, FovixVpnService::class.java).apply {
             putExtra("name", server.name)
             putExtra("host", server.host)
             putExtra("port", server.port)
             putExtra("uuid", server.uuid)
         }
-
-        appContext.startService(intent)
+        context.startService(intent)
     }
 
-    fun disconnect() {
-        val intent = Intent(appContext, FovixVpnService::class.java)
-        appContext.stopService(intent)
+    fun disconnect(context: Context) {
+        context.stopService(Intent(context, FovixVpnService::class.java))
     }
 }
