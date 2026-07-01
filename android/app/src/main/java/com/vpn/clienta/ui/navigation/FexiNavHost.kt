@@ -1,49 +1,28 @@
 package com.vpn.clienta.ui.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.vpn.clienta.ui.components.FexiBottomBar
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.vpn.clienta.ui.screens.HomeScreen
 import com.vpn.clienta.ui.screens.ServersScreen
-import com.vpn.clienta.ui.screens.SettingsScreen
-import com.vpn.clienta.viewmodel.VPNViewModel
 
 @Composable
-fun FexiNavHost(
-    modifier: Modifier = Modifier,
-    vpnViewModel: VPNViewModel = viewModel()
-) {
+fun FexiNavHost() {
 
-    var current by remember { mutableStateOf(FexiDestination.Home) }
+    val navController = rememberNavController()
 
-    Scaffold(
-        modifier = modifier,
-        bottomBar = {
-            FexiBottomBar(
-                currentDestination = current,
-                onDestinationSelected = { current = it }
-            )
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+
+        composable("home") {
+            HomeScreen()
         }
-    ) { padding ->
 
-        when (current) {
-
-            FexiDestination.Home -> HomeScreen(
-                viewModel = vpnViewModel,
-                modifier = Modifier.padding(padding)
-            )
-
-            FexiDestination.Servers -> ServersScreen(
-                viewModel = vpnViewModel,
-                modifier = Modifier.padding(padding)
-            )
-
-            FexiDestination.Settings -> SettingsScreen(
-                modifier = Modifier.padding(padding)
-            )
+        composable("servers") {
+            ServersScreen()
         }
     }
 }
