@@ -1,4 +1,4 @@
-name: Android CI (SAFE BUILD)
+name: Android CI
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,25 +19,19 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      # 🔴 1. GRADLE SYNC CHECK (без APK)
-      - name: Gradle configuration check
-        run: ./gradlew tasks --no-daemon
+      # 🔴 ВСЕ ДАЛЬШЕ РАБОТАЕТ ИЗ /android
 
-      # 🔴 2. COMPILE CHECK (самое важное)
-      - name: Compile Kotlin (NO APK)
-        run: ./gradlew compileDebugKotlin --stacktrace
+      - name: Grant permission
+        run: cd android && chmod +x gradlew
 
-      # 🔴 3. RESOURCE + MANIFEST CHECK
-      - name: Validate resources
-        run: ./gradlew processDebugResources --stacktrace
+      - name: Gradle tasks check
+        run: cd android && ./gradlew tasks --no-daemon
 
-      # 🔵 4. FULL BUILD ONLY IF ABOVE OK
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: cd android && ./gradlew assembleDebug --stacktrace
 
-      # 📦 5. ARTIFACT
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/debug/*.apk
