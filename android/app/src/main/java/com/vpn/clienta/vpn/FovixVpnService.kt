@@ -1,6 +1,8 @@
 package com.vpn.clienta.vpn
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
@@ -19,6 +21,7 @@ class FovixVpnService : VpnService() {
         val uuid = intent.getStringExtra("uuid") ?: ""
 
         startForeground(1001, createNotification(name))
+
         startSingBox(host, port, uuid)
 
         return START_STICKY
@@ -49,13 +52,14 @@ class FovixVpnService : VpnService() {
         }
         """.trimIndent()
 
-        val configFile = File(applicationContext.filesDir, "config.json")
+        val configFile = File(filesDir, "config.json")
         configFile.writeText(config)
 
-        val binary = File(applicationContext.filesDir, "sing-box")
+        val binary = File(filesDir, "sing-box")
 
         if (!binary.exists()) {
-            throw IllegalStateException("sing-box binary not found")
+            stopSelf()
+            return
         }
 
         process = ProcessBuilder(
@@ -63,12 +67,13 @@ class FovixVpnService : VpnService() {
             "run",
             "-c",
             configFile.absolutePath
-        ).redirectErrorStream(true)
+        )
+            .redirectErrorStream(true)
             .start()
     }
 
     override fun onDestroy() {
-        process?.destroy()
+        process?.destroyForcibly()
         process = null
         super.onDestroy()
     }
@@ -91,7 +96,7 @@ class FovixVpnService : VpnService() {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Fovix VPN")
             .setContentText(title)
-            .setSmallIcon(android.R.drawable.stat_sys_vpn_ic)
+            .setSmallIcon(android.R.drawable.stat_sys_vpn)
             .setOngoing(true)
             .build()
     }

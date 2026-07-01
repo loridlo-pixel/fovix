@@ -3,10 +3,7 @@ package com.vpn.clienta
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.vpn.clienta.ui.navigation.FexiNavHost
-import com.vpn.clienta.ui.theme.VPNClientATheme
-import com.vpn.clienta.viewmodel.VPNViewModel
+import com.vpn.clienta.ui.navigation.FovixNavHost
 
 class MainActivity : ComponentActivity() {
 
@@ -14,14 +11,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            VPNClientATheme {
-
-                val vm: VPNViewModel = viewModel()
-
-                FexiNavHost(
-                    viewModel = vm
-                )
-            }
+            FovixNavHost()
         }
     }
 }
