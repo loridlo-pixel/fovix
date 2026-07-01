@@ -1,6 +1,6 @@
 package com.vpn.clienta.data.parser
 
-import com.vpn.clienta.data.model.VpnServer
+import com.vpn.clienta.core.model.VpnServer
 
 object QrParser {
 

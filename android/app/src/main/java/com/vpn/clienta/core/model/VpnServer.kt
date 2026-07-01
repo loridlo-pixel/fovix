@@ -4,5 +4,6 @@ data class VpnServer(
     val name: String,
     val host: String,
     val port: Int,
-    val uuid: String = ""
+    val uuid: String = "",
+    val raw: String = ""
 )
