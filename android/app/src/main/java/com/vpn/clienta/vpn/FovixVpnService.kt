@@ -1,15 +1,3 @@
-package com.vpn.clienta.vpn
-
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Intent
-import android.net.VpnService
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import com.vpn.clienta.core.model.VpnServer
-import java.io.File
-
 class FovixVpnService : VpnService() {
 
     private var process: Process? = null
@@ -53,13 +41,15 @@ class FovixVpnService : VpnService() {
         }
         """.trimIndent()
 
-        val configFile = File(filesDir, "config.json")
-        configFile.writeText(config)
+        val configFile = File(filesDir, "config.json").apply {
+            writeText(config)
+        }
 
         val binary = File(filesDir, "sing-box")
 
         if (!binary.exists()) {
-            throw IllegalStateException("sing-box binary not found in app filesDir")
+            stopSelf()
+            throw IllegalStateException("sing-box binary not installed")
         }
 
         process = ProcessBuilder(
@@ -76,28 +66,5 @@ class FovixVpnService : VpnService() {
         process?.destroy()
         process = null
         super.onDestroy()
-    }
-
-    private fun createNotification(title: String): Notification {
-
-        val channelId = "vpn_channel"
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "VPN Service",
-                NotificationManager.IMPORTANCE_LOW
-            )
-
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
-
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Fovix VPN")
-            .setContentText(title)
-            .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setOngoing(true)
-            .build()
     }
 }

@@ -1,13 +1,25 @@
 package com.vpn.clienta.vpn
 
+import android.content.Context
+import android.content.Intent
 import com.vpn.clienta.core.model.VpnServer
 
 object VpnEngine {
 
-    fun connect(server: VpnServer) {
-        // stub for sing-box integration
+    fun connect(context: Context, server: VpnServer) {
+
+        val intent = Intent(context, FovixVpnService::class.java).apply {
+            putExtra("name", server.name)
+            putExtra("host", server.host)
+            putExtra("port", server.port)
+            putExtra("uuid", server.uuid)
+        }
+
+        context.startForegroundService(intent)
     }
 
-    fun disconnect() {
+    fun disconnect(context: Context) {
+        val intent = Intent(context, FovixVpnService::class.java)
+        context.stopService(intent)
     }
 }

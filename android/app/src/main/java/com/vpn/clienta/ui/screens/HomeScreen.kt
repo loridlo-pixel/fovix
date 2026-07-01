@@ -1,39 +1,51 @@
 package com.vpn.clienta.ui.screens
 
-import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.vpn.clienta.viewmodel.VPNViewModel
+import com.vpn.clienta.core.model.VpnServer
 
 @Composable
-fun HomeScreen(viewModel: VPNViewModel = viewModel()) {
+fun HomeScreen(
+    onOpenServers: () -> Unit
+) {
 
-    val state by viewModel.state.collectAsState()
+    var isConnected by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
         Text(
-            text = if (state.isConnected) "Connected" else "Disconnected",
-            color = if (state.isConnected) Color.Green else Color.Red
+            text = if (isConnected) "CONNECTED" else "DISCONNECTED",
+            style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
 
-        Button(onClick = {
-            if (state.isConnected) viewModel.disconnect()
-            else viewModel.connect()
-        }) {
-            Text(if (state.isConnected) "Disconnect" else "Connect")
+        Button(
+            onClick = {
+                isConnected = !isConnected
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (isConnected) "DISCONNECT" else "CONNECT")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-        state.selectedServer?.let {
-            Text("Server: ${it.name}")
+        OutlinedButton(
+            onClick = onOpenServers,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("SERVERS")
         }
     }
 }

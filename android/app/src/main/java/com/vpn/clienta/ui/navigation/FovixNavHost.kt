@@ -6,9 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vpn.clienta.ui.screens.HomeScreen
 import com.vpn.clienta.ui.screens.ServersScreen
+import com.vpn.clienta.ui.screens.SettingsScreen
 
 @Composable
-fun FexiNavHost() {
+fun FovixNavHost() {
 
     val navController = rememberNavController()
 
@@ -18,11 +19,21 @@ fun FexiNavHost() {
     ) {
 
         composable("home") {
-            HomeScreen()
+            HomeScreen(
+                onOpenServers = { navController.navigate("servers") }
+            )
         }
 
         composable("servers") {
-            ServersScreen()
+            ServersScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("settings") {
+            SettingsScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

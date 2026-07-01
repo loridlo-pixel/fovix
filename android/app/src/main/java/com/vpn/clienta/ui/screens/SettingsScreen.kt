@@ -1,49 +1,35 @@
 package com.vpn.clienta.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vpn.clienta.logger.LogExporter
-import com.vpn.clienta.ui.theme.*
 
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier
+    onBack: () -> Unit = {}
 ) {
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(NordBg)
-            .padding(16.dp)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text("SETTINGS", color = NordBlue)
+        Text("Settings")
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(24.dp))
 
-        Card(colors = CardDefaults.cardColors(NordCard)) {
-            Column(Modifier.padding(12.dp)) {
-                Text("Diagnostics", color = NordGray)
+        Text("VPN Client A / Fovix core")
 
-                Button(
-                    onClick = { LogExporter.export() }
-                ) {
-                    Text("EXPORT LOGS")
-                }
-            }
-        }
+        Spacer(Modifier.height(24.dp))
 
-        Spacer(Modifier.height(12.dp))
-
-        Card(colors = CardDefaults.cardColors(NordCard)) {
-            Column(Modifier.padding(12.dp)) {
-                Text("Subscription", color = NordGray)
-                Text("Auto sync enabled")
-            }
+        Button(onClick = onBack) {
+            Text("Back")
         }
     }
 }

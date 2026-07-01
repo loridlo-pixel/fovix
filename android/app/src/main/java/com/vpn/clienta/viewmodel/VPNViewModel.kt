@@ -1,13 +1,17 @@
 package com.vpn.clienta.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.vpn.clienta.core.model.VpnServer
 import com.vpn.clienta.ui.state.VpnUiState
+import com.vpn.clienta.vpn.VpnEngine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class VPNViewModel : ViewModel() {
+class VPNViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val appContext = application.applicationContext
 
     private val _state = MutableStateFlow(VpnUiState())
     val state: StateFlow<VpnUiState> = _state.asStateFlow()
@@ -21,10 +25,19 @@ class VPNViewModel : ViewModel() {
     }
 
     fun connect() {
+        val server = _state.value.selectedServer ?: return
+
+        _state.value = _state.value.copy(isConnected = false)
+
+        // 🔥 ВАЖНО: запуск VPN цепочки
+        VpnEngine.connect(appContext, server)
+
         _state.value = _state.value.copy(isConnected = true)
     }
 
     fun disconnect() {
+        VpnEngine.disconnect(appContext)
+
         _state.value = _state.value.copy(isConnected = false)
     }
 }
