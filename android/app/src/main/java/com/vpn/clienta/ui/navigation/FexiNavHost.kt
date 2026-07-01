@@ -11,10 +11,6 @@ import com.vpn.clienta.ui.screens.ServersScreen
 import com.vpn.clienta.ui.screens.SettingsScreen
 import com.vpn.clienta.viewmodel.VPNViewModel
 
-enum class FexiDestination {
-    Home, Servers, Settings
-}
-
 @Composable
 fun FexiNavHost(
     modifier: Modifier = Modifier,

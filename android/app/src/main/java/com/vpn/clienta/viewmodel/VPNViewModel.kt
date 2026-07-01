@@ -1,36 +1,30 @@
 package com.vpn.clienta.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.vpn.clienta.parser.VlessServer
-import com.vpn.clienta.vpn.VpnEngine
+import com.vpn.clienta.core.model.VpnServer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class VPNViewModel : ViewModel() {
 
-    private val _servers = MutableStateFlow<List<VlessServer>>(emptyList())
-    val servers: StateFlow<List<VlessServer>> = _servers
+    private val _servers = MutableStateFlow<List<VpnServer>>(emptyList())
+    val servers: StateFlow<List<VpnServer>> = _servers
 
-    private val _selected = MutableStateFlow<VlessServer?>(null)
-    val selected = _selected
+    private val _selectedServer = MutableStateFlow<VpnServer?>(null)
+    val selectedServer: StateFlow<VpnServer?> = _selectedServer
 
-    init {
-        loadMockServers()
+    private val _vpnState = MutableStateFlow("DISCONNECTED")
+    val vpnState: StateFlow<String> = _vpnState
+
+    fun setServers(list: List<VpnServer>) {
+        _servers.value = list
     }
 
-    private fun loadMockServers() {
-        _servers.value = listOf(
-            VlessServer("Test 1", "1.1.1.1", 443, "uuid-1"),
-            VlessServer("Test 2", "8.8.8.8", 443, "uuid-2")
-        )
+    fun selectServer(server: VpnServer) {
+        _selectedServer.value = server
     }
 
-    fun connectToServer(server: VlessServer) {
-        _selected.value = server
-        VpnEngine.connect(server)
-    }
-
-    fun disconnect() {
-        VpnEngine.disconnect()
+    fun setState(state: String) {
+        _vpnState.value = state
     }
 }

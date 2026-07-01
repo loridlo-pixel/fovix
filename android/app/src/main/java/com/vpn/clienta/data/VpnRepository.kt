@@ -1,17 +1,23 @@
 package com.vpn.clienta.data
 
-object VpnRepository {
+import com.vpn.clienta.core.model.VpnServer
 
-    private val servers = mutableListOf<`VlessServer.kt`>()
+class VpnRepository {
 
-    fun setServers(list: List<`VlessServer.kt`>) {
+    private val servers = mutableListOf<VpnServer>()
+
+    fun setServers(list: List<VpnServer>) {
         servers.clear()
         servers.addAll(list)
     }
 
-    fun getServers(): List<`VlessServer.kt`> = servers
+    fun getServers(): List<VpnServer> = servers
 
-    fun getByName(name: String): `VlessServer.kt`? {
-        return servers.find { it.name == name }
+    fun getByName(name: String): VpnServer? {
+        return servers.firstOrNull { it.name == name }
+    }
+
+    fun clear() {
+        servers.clear()
     }
 }
