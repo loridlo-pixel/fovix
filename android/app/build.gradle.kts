@@ -4,7 +4,6 @@ plugins {
 }
 
 android {
-
     namespace = "com.vpn.clienta"
     compileSdk = 34
 
@@ -40,10 +39,6 @@ android {
 
         release {
             isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
 }

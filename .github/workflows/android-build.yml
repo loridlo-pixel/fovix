@@ -3,7 +3,6 @@ name: Android CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
 
 jobs:
   build:
@@ -19,16 +18,25 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      # 🔴 ВСЕ ДАЛЬШЕ РАБОТАЕТ ИЗ /android
+      # 🔥 ЖЁСТКАЯ ОЧИСТКА КЭША
+      - name: Clean Gradle caches
+        run: |
+          rm -rf ~/.gradle/caches
+          rm -rf ~/.gradle/daemon
+          rm -rf ~/.gradle/native
+          rm -rf ~/.gradle/wrapper
+          rm -rf .gradle
+          rm -rf android/.gradle
 
-      - name: Grant permission
-        run: cd android && chmod +x gradlew
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
 
-      - name: Gradle tasks check
-        run: cd android && ./gradlew tasks --no-daemon
+      - name: Clean project
+        run: cd android && ./gradlew clean --no-daemon
 
+      # 🔥 СБОРКА БЕЗ КЭША
       - name: Build Debug APK
-        run: cd android && ./gradlew assembleDebug --stacktrace
+        run: cd android && ./gradlew assembleDebug --no-daemon --no-build-cache --refresh-dependencies
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
