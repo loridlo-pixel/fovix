@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -25,13 +24,11 @@
 
         </activity>
 
-        <!-- VPN SERVICE -->
         <service
             android:name=".vpn.FovixVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:exported="true"
-            android:foregroundServiceType="connectedDevice">
-        </service>
+            android:foregroundServiceType="connectedDevice" />
 
     </application>
 
