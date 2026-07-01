@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
@@ -46,7 +47,7 @@ dependencies {
 
     // COMPOSE CORE
     implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.activity:activity-compose")
+    implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
 
     // UI
