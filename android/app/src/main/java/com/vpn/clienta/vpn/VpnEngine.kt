@@ -1,16 +1,28 @@
 package com.vpn.clienta.vpn
 
-import android.content.Context
+import android.content.Intent
+import androidx.core.content.ContextCompat
+import com.vpn.clienta.AppContext
+import com.vpn.clienta.parser.VlessServer
 
-class VpnEngine(private val context: Context) {
+object VpnEngine {
 
-    private val core = SingBoxController(context)
+    fun connect(server: VlessServer) {
 
-    fun start(config: String) {
-        core.start(config)
+        val ctx = AppContext.get()
+
+        val intent = Intent(ctx, FovixVpnService::class.java).apply {
+            putExtra("host", server.host)
+            putExtra("port", server.port)
+            putExtra("uuid", server.uuid)
+        }
+
+        ContextCompat.startForegroundService(ctx, intent)
     }
 
-    fun stop() {
-        core.stop()
+    fun disconnect() {
+        val ctx = AppContext.get()
+        val intent = Intent(ctx, FovixVpnService::class.java)
+        ctx.stopService(intent)
     }
 }
