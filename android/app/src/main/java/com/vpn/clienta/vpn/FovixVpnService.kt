@@ -6,8 +6,8 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
+import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.vpn.clienta.core.model.VpnServer
 import java.io.File
 
 class FovixVpnService : VpnService() {
@@ -16,8 +16,8 @@ class FovixVpnService : VpnService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val name = intent?.getStringExtra("name") ?: return START_NOT_STICKY
-        val host = intent.getStringExtra("host") ?: return START_NOT_STICKY
+        val name = intent?.getStringExtra("name") ?: "VPN"
+        val host = intent?.getStringExtra("host") ?: return START_NOT_STICKY
         val port = intent.getIntExtra("port", 443)
         val uuid = intent.getStringExtra("uuid") ?: return START_NOT_STICKY
 
@@ -30,15 +30,49 @@ class FovixVpnService : VpnService() {
 
     private fun startSingBox(host: String, port: Int, uuid: String) {
 
-        val config = """
+        stopProcessIfNeeded()
+
+        val configFile = File(filesDir, "config.json")
+
+        val config = buildConfig(host, port, uuid)
+        configFile.writeText(config)
+
+        val binary = File(filesDir, "sing-box")
+
+        if (!binary.exists()) {
+            throw IllegalStateException("sing-box binary not found in filesDir")
+        }
+
+        process = ProcessBuilder(
+            binary.absolutePath,
+            "run",
+            "-c",
+            configFile.absolutePath
+        )
+            .redirectErrorStream(true)
+            .start()
+    }
+
+    private fun stopProcessIfNeeded() {
+        try {
+            process?.destroy()
+            process = null
+        } catch (_: Exception) {}
+    }
+
+    private fun buildConfig(host: String, port: Int, uuid: String): String {
+        return """
         {
-          "log": { "level": "info" },
+          "log": {
+            "level": "info"
+          },
           "inbounds": [
             {
               "type": "tun",
               "inet4_address": "172.19.0.1/30",
               "auto_route": true,
-              "strict_route": true
+              "strict_route": true,
+              "stack": "system"
             }
           ],
           "outbounds": [
@@ -52,39 +86,26 @@ class FovixVpnService : VpnService() {
           ]
         }
         """.trimIndent()
-
-        val file = File(filesDir, "config.json")
-        file.writeText(config)
-
-        val binary = File(filesDir, "sing-box")
-
-        if (!binary.exists()) {
-            throw IllegalStateException("sing-box binary not installed")
-        }
-
-        process = ProcessBuilder(
-            binary.absolutePath,
-            "run",
-            "-c",
-            file.absolutePath
-        ).start()
     }
 
     override fun onDestroy() {
-        process?.destroy()
+        stopProcessIfNeeded()
         super.onDestroy()
     }
 
+    override fun onBind(intent: Intent?): IBinder? = null
+
     private fun createNotification(title: String): Notification {
 
-        val channelId = "vpn"
+        val channelId = "vpn_channel"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "VPN",
+                "VPN Service",
                 NotificationManager.IMPORTANCE_LOW
             )
+
             getSystemService(NotificationManager::class.java)
                 .createNotificationChannel(channel)
         }
@@ -93,6 +114,7 @@ class FovixVpnService : VpnService() {
             .setContentTitle("Fovix VPN")
             .setContentText(title)
             .setSmallIcon(android.R.drawable.stat_sys_vpn_ic)
+            .setOngoing(true)
             .build()
     }
 }

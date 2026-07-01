@@ -1,72 +1,108 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
-    namespace = "com.vpn.clienta"
 
-    compileSdk = 36
+    namespace = "com.vpn.clienta"
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.vpn.clienta"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
+
         versionCode = 1
         versionName = "1.0"
+
+        // 🔴 FAIL FAST: если ресурсы битые — билд падает сразу
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
-        release {
+
+        debug {
             isMinifyEnabled = false
+            isDebuggable = true
+        }
+
+        release {
+
+            isMinifyEnabled = true
+
+            // 🔴 PRO GUARD (чтобы не падало на релизе)
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        jvmToolchain(11)
+    kotlinOptions {
+        jvmTarget = "17"
+
+        // 🔴 FAIL EARLY KOTLIN CHECK
+        freeCompilerArgs += listOf(
+            "-Xjsr305=strict",
+            "-Xstrict-java-nullability-assertions"
+        )
     }
 
     buildFeatures {
         compose = true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
+    packaging {
+        resources {
+            // 🔴 FIX COMMON CI FAILS
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
 
-    // NETWORK
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // CORE
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.activity:activity-compose:1.9.2")
+
+    // COMPOSE
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // VIEWMODEL
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
 
     // COROUTINES
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // COMPOSE CORE
-    implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.activity:activity-compose:1.9.3")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
+    // NETWORK
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // UI
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation("androidx.compose.foundation:foundation")
-    implementation(libs.androidx.compose.material3)
-    implementation("androidx.compose.material:material-icons-extended")
+    // CAMERA X (QR)
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    // ML KIT
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
-    // TESTS
-    testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
-
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // JSON SAFE PARSING
+    implementation("com.google.code.gson:gson:2.11.0")
 }

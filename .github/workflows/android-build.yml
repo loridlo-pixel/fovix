@@ -1,16 +1,16 @@
-name: Android CI
+name: Android CI (SAFE BUILD)
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: [ "main" ]
+  pull_request:
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -19,14 +19,25 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
+      # 🔴 1. GRADLE SYNC CHECK (без APK)
+      - name: Gradle configuration check
+        run: ./gradlew tasks --no-daemon
 
+      # 🔴 2. COMPILE CHECK (самое важное)
+      - name: Compile Kotlin (NO APK)
+        run: ./gradlew compileDebugKotlin --stacktrace
+
+      # 🔴 3. RESOURCE + MANIFEST CHECK
+      - name: Validate resources
+        run: ./gradlew processDebugResources --stacktrace
+
+      # 🔵 4. FULL BUILD ONLY IF ABOVE OK
       - name: Build Debug APK
-        run: cd android && ./gradlew clean assembleDebug --stacktrace
+        run: ./gradlew assembleDebug
 
-      - name: Upload APK artifact
+      # 📦 5. ARTIFACT
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/*.apk

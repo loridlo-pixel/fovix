@@ -14,10 +14,6 @@ class VpnRepository {
     fun getServers(): List<VpnServer> = servers
 
     fun getByName(name: String): VpnServer? {
-        return servers.firstOrNull { it.name == name }
-    }
-
-    fun clear() {
-        servers.clear()
+        return servers.find { it.name == name }
     }
 }

@@ -1,25 +1,35 @@
 package com.vpn.clienta.ui.components
 
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import com.vpn.clienta.core.model.VpnServer
 
 @Composable
 fun ServerCard(
     server: VpnServer,
+    selected: Boolean,
     onClick: () -> Unit
 ) {
-    androidx.compose.material3.Card(
+    Card(
         onClick = onClick
     ) {
-        androidx.compose.foundation.layout.Column {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
 
-            androidx.compose.material3.Text(text = server.name)
-            androidx.compose.material3.Text(text = server.host)
-            androidx.compose.material3.Text(text = "${server.port}")
-
-            androidx.compose.material3.Text(
-                text = server.protocol
+            Text(
+                text = server.name,
+                style = MaterialTheme.typography.titleMedium
             )
+
+            Text(
+                text = "${server.host}:${server.port}",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            if (selected) {
+                Text("SELECTED", color = MaterialTheme.colorScheme.primary)
+            }
         }
     }
 }

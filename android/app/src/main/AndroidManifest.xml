@@ -1,19 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- INTERNET -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- FOREGROUND SERVICE -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_VPN" />
-
-    <!-- VPN -->
-    <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
+    <!-- CAMERA (QR SCANNER, если уже используешь) -->
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
-        android:label="Fovix"
-        android:supportsRtl="true">
+        android:label="Fovix VPN"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
 
         <!-- MAIN ACTIVITY -->
         <activity
@@ -27,11 +24,11 @@
 
         </activity>
 
-        <!-- VPN SERVICE -->
+        <!-- VPN SERVICE (КРИТИЧНО) -->
         <service
             android:name=".vpn.FovixVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:exported="false"
+            android:exported="true"
             android:foregroundServiceType="vpn" />
 
     </application>
