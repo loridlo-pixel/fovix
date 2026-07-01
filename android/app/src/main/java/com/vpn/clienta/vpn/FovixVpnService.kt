@@ -1,3 +1,12 @@
+package com.vpn.clienta.vpn
+
+import android.app.*
+import android.content.Intent
+import android.net.VpnService
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import java.io.File
+
 class FovixVpnService : VpnService() {
 
     private var process: Process? = null
@@ -10,7 +19,6 @@ class FovixVpnService : VpnService() {
         val uuid = intent.getStringExtra("uuid") ?: ""
 
         startForeground(1001, createNotification(name))
-
         startSingBox(host, port, uuid)
 
         return START_STICKY
@@ -41,15 +49,13 @@ class FovixVpnService : VpnService() {
         }
         """.trimIndent()
 
-        val configFile = File(filesDir, "config.json").apply {
-            writeText(config)
-        }
+        val configFile = File(applicationContext.filesDir, "config.json")
+        configFile.writeText(config)
 
-        val binary = File(filesDir, "sing-box")
+        val binary = File(applicationContext.filesDir, "sing-box")
 
         if (!binary.exists()) {
-            stopSelf()
-            throw IllegalStateException("sing-box binary not installed")
+            throw IllegalStateException("sing-box binary not found")
         }
 
         process = ProcessBuilder(
@@ -57,8 +63,7 @@ class FovixVpnService : VpnService() {
             "run",
             "-c",
             configFile.absolutePath
-        )
-            .redirectErrorStream(true)
+        ).redirectErrorStream(true)
             .start()
     }
 
@@ -66,5 +71,28 @@ class FovixVpnService : VpnService() {
         process?.destroy()
         process = null
         super.onDestroy()
+    }
+
+    private fun createNotification(title: String): Notification {
+
+        val channelId = "vpn_channel"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "VPN Service",
+                NotificationManager.IMPORTANCE_LOW
+            )
+
+            getSystemService(NotificationManager::class.java)
+                .createNotificationChannel(channel)
+        }
+
+        return NotificationCompat.Builder(this, channelId)
+            .setContentTitle("Fovix VPN")
+            .setContentText(title)
+            .setSmallIcon(android.R.drawable.stat_sys_vpn_ic)
+            .setOngoing(true)
+            .build()
     }
 }
