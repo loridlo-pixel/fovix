@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "vpn-client-a"
-include(":app")":app")
+rootProject.name = "fovix"
+include(":app")
