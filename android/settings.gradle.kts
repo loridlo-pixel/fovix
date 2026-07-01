@@ -7,11 +7,12 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
 }
 
-rootProject.name = "VPNClientA"
-include(":app")
+rootProject.name = "vpn-client-a"
+include(":app")":app")
